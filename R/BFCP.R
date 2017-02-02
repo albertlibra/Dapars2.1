@@ -59,7 +59,7 @@ SIBER1.1 <- function(y,model='E'){
   res <- rep(NA, 8) 
   names(res) <- c('mu1', 'mu2', 'sigma1', 'sigma2', 'pi', 'delta', 'DI','mdiff') 
   # if y has NA, all result will be NA; thus need to remove NA beforehand
-  fit <- fitNL(noNA(y), model=model)[1:5]
+  fit <- fitNL1(noNA(y), model=model)[1:5]
   # browser()
   # fit <- fitNL(y, model='V')[1:5]
   DIinfo <- parToBI(fit)
@@ -107,7 +107,7 @@ parToBI <- function(mat){
 #' @return A vector consisting parameter estimates of mu1, mu2, sigma1, sigma2, pi1, logLik and BIC. 
 #' @references Tong, P., Chen, Y., Su, X. and Coombes, K. R. (2012). Systematic Identification of Bimodally Expressed Genes Using RNAseq Data. Bioinformatics, submitted.
 #' @export
-fitNL <- function(y,d=NULL, model='E') {
+fitNL1 <- function(y,d=NULL, model='E') {
   if(is.null(d)) d <- rep(1, length(y)) #	default, no normalization
   res <- rep(NA, 7) # mu1, mu2, sigma1, sigma2, pi1, logLik, BIC
   names(res) <- c('mu1', 'mu2', 'sigma1', 'sigma2', 'pi1', 'logLik', 'BIC') # 1:7
