@@ -80,6 +80,33 @@ parToBI <- function(mat){
   }
   res
 }
+#######################################################################################################
+############################################# NL mix ##################################################
+#######################################################################################################
+# for completeness, we also incorporate normal mixture for microarray data. We use NL to denote normal.
+#' Fit Normal Mixture Model
+#' The function fits a two-component normal mixture model. 
+#'
+#' The parameter estimates from log normal mixture is obtained by taking logarithm and fit normal mixture. We use
+#' mclust package to obtain parameter estimates of normal mixture model. In particular, \eqn{log_{base}(\frac{y+eps}{d})} is used to
+#' fit to normal mixture model. 
+#' 
+#' With this function, three models can be fitted: (1) log normal mixture with equal variance (E model); 
+#' (2) Generalized Poisson mixture with unequal variance (V model); (3) 0-inflated log normal model.
+#' The 0-inflated log normal has the following density function:
+#' 
+#' \eqn{P(Y=y)=\pi D(y) + (1-\pi)LN(\mu, \sigma)} where D is the point mass at 0 while \eqn{LN(\mu, \sigma)} is the density
+#' of log normal distribution with mean \eqn{\mu} and variance \eqn{\sigma^2}. 
+#' 
+#' The rule to fit 0-inflated model is that the observed percentage of count exceeds the user specified threshold. This
+#' rule overrides the model argument (E or V) when observed percentae of zero count exceeds the threshold.
+#' 
+#' @param y A vector representing the RNAseq raw count.
+#' @param d A vector of the same length as y representing the normalization constant to be applied to the data. For the LN model, the original data would be devided by this vector. 
+#' @param model Character specifying E or V model. E model fits the mixture model with equal variance while V model doesn't put any constraint. 
+#' @return A vector consisting parameter estimates of mu1, mu2, sigma1, sigma2, pi1, logLik and BIC. 
+#' @references Tong, P., Chen, Y., Su, X. and Coombes, K. R. (2012). Systematic Identification of Bimodally Expressed Genes Using RNAseq Data. Bioinformatics, submitted.
+#' @export
 fitNL <- function(y,d=NULL, model='E') {
   if(is.null(d)) d <- rep(1, length(y)) #	default, no normalization
   res <- rep(NA, 7) # mu1, mu2, sigma1, sigma2, pi1, logLik, BIC
