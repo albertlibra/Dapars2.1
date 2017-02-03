@@ -23,7 +23,7 @@ mclust package to obtain parameter estimates of normal mixture model. In particu
 fit to normal mixture model.
 }
 \details{
-With this function, three models can be fitted: (1) log normal mixture with equal variance (E model); 
+With this function, three models can be fitted: (1) log normal mixture with equal variance (E model);
 (2) Generalized Poisson mixture with unequal variance (V model); (3) 0-inflated log normal model.
 The 0-inflated log normal has the following density function:
 
