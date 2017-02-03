@@ -1,9 +1,9 @@
 Package: Dapars2.1
 Title: Bimodal normal distribution mixture fitting
 Version: 0.0001
-Authors@R: person("First", "Last", email = "first.last@example.com", role = c("aut", "cre"))
+Authors@R: person("Weijiang", "zhou", email = "weijianz@bcm.edu", role = c("aut", "cre"))
 Description: Bimodal normal distribution mixture fitting.
-Depends: R (>= 3.3.2) mclust (>= 5.2.2)
+Depends: R (>= 3.3.2) 
 License: GPL
 Encoding: UTF-8
 LazyData: true

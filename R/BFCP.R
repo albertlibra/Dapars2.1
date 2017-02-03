@@ -95,7 +95,7 @@ BFCP <- function(mat, parallel=TRUE){
         names(res) <- c('mu1', 'mu2', 'sigma1', 'sigma2', 'pi1', 'logLik', 'BIC') # 1:7
         Dat <- y/d # normalization
         # browser()
-
+        require(mclust)
         mc <- try(Mclust(Dat, G = 2, modelNames = model), silent  = TRUE)
         # browser()
 
@@ -122,6 +122,7 @@ BFCP <- function(mat, parallel=TRUE){
     res
   }
   mat=mat*100
+  require(plyr)
   # options(warn = -1)
   if(parallel){
     cl <- createCluster(core=detectCores(), logfile = "/dev/null",lib = 'mclust')
@@ -132,7 +133,40 @@ BFCP <- function(mat, parallel=TRUE){
   res <- moveColumnToRowName(tmpRes)
   res
 }
+####
+#' Load PUDI txt file
+#'
+#' @param file txt file
+#' @keywords load PUDI
+#' @examples
+#' datL_brca <- loadPDUIdata(file=file.path(DirInputData, 'BRCA_known_APA_Combined_PDUIs.txt'),col_anno=1:3,header=T)
+#' @export
 
-
-
+loadPDUIdata <- function(file, col_anno=1:3, header=TRUE, TvsN=FALSE){
+  #browser()
+  require(stringr)
+  require(testthat)
+  tt <- read.delim(file, check.names=F, header=header)
+  percentage <- apply( tt, 1, function(x){ sum(is.na(x))/(length(x)-2)})
+  tt <- tt[!(percentage >= 0.2),] #less than 20% missing data
+  anno <- tt[, col_anno]
+  mat <- tt[, (length(col_anno)+1):ncol(tt)]
+  # no duplicated event_id
+  expect_true(!anyDuplicated(anno[, 1]))
+  #browser()
+  if(TvsN==TRUE){
+    id <- colnames(mat)
+    justID <- str_replace(id, '_T|_N', '')
+    isN <- str_detect(id, '_N')
+    isT <- str_detect(id, '_T')
+    mat_N <- mat[, isN]
+    mat_T <- mat[, isT]
+    rownames(anno) <- rownames(mat_N) <- rownames(mat_T) <- anno[, 1]
+    res <- list(mat_T=data.matrix(mat_T), mat_N=data.matrix(mat_N), anno=anno)
+  } else {
+    rownames(anno) <- rownames(mat) <- anno[, 1]
+    res <- list(mat=data.matrix(mat), anno=anno)
+  }
+  res
+}
 
