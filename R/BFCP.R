@@ -60,7 +60,7 @@ SIBER1.1 <- function(y,model='E'){
   names(res) <- c('mu1', 'mu2', 'sigma1', 'sigma2', 'pi', 'delta', 'DI','mdiff')
   # if y has NA, all result will be NA; thus need to remove NA beforehand
   fit <- fitNL1(noNA(y), model=model)[1:5]
-  browser()
+  # browser()
   # fit <- fitNL(y, model='V')[1:5]
   DIinfo <- parToDI(fit)
   res[1:5] <- fit
