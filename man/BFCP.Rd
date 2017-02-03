@@ -2,17 +2,17 @@
 % Please edit documentation in R/BFCP.R
 \name{BFCP}
 \alias{BFCP}
-\title{A Cat Function}
+\title{A Bimodal fitting calculation parallel (BFCP)computing function}
 \usage{
 BFCP(mat, parallel = TRUE)
 }
 \arguments{
-\item{love}{Do you love cats? Defaults to TRUE.}
+\item{mat}{Input a data frame}
 }
 \description{
-This function allows you to express your love of cats.
+A Bimodal fitting calculation parallel (BFCP)computing function
 }
 \examples{
-cat_function()
+brca <- BFCP((datL_brca_all$mat), parallel=TRUE)
 }
-\keyword{cats}
+\keyword{Bimodal}
