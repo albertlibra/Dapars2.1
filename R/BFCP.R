@@ -233,3 +233,17 @@ plotGene <- function(dataraw, DI, gene){
   # browser()
   plotNormal(noNA(dataraw$mat[gene,]*100), xlab='PDUI',main=sprintf('%s\n%s', gene, info))
 }
+
+createFolder <- function(path, echo=FALSE) {
+  if(!file.exists(path))
+  {
+    #browser()
+    if(echo)
+      cat('New folder created for:\n', deparse(substitute(path)), ':\t', path, '\n')
+    dir.create(path, recursive=TRUE)
+  } else {
+    #browser()
+    if(echo)
+      cat('Folder already existed for:\n', deparse(substitute(path)), ':\t', path, '\n')
+  }
+}
