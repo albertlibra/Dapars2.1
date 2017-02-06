@@ -170,3 +170,66 @@ loadPDUIdata <- function(file, col_anno=1:3, header=TRUE, TvsN=FALSE){
   res
 }
 
+######
+#' plot normal distribution mix for one gene_id
+#'
+#'@param dataraw raw dataframe
+#'@param DI calculated Di value dataframe
+#'@param gene gene id name
+#'@examples plotGene(datL_brca_all,di_brca_all,gene)
+#'@export
+plotGene <- function(dataraw, DI, gene){
+  #browser()
+  getInfo <- function(x, short=F){
+    res <- sprintf('pi1=%.2f, mDiff=%.2f, DI=%.2f,sigma1=%.2f,sigma2=%.2f', x[, 'pi'], x[, 'mdiff'], x[,'DI'],x[,'sigma1'],x[,'sigma2'])
+    res
+  }
+  noNA <- function (dat, returnIndex = FALSE) {
+    sel <- complete.cases(dat)
+    if (returnIndex)
+      return(sel)
+    if (is.null(dim(dat))) {
+      res <- dat[sel]
+    }
+    else {
+      res <- dat[sel, ]
+    }
+    res
+  }
+  plotNormal <- function(x, xlim=range(x), main=main,lwdMixture=1.2, weighted=T, addComp=T, colComp='blue', plot=TRUE, ...){ # input is untransformed data
+    # browser()
+    fit <- DI[gene, ]
+    mus <- c(fit[,'mu1'], fit[,'mu2'])
+    sigmas <- c(fit[,'sigma1'], fit[,'sigma2'])
+    pis <- c(fit[,'pi'], 1-fit[,'pi'])
+    # browser()
+    # xlim[2] can be inf, make it too large
+    if(!is.finite(xlim[2])) xlim[2] <- quantile(x, 0.99, na.rm=T)
+    qs <- seq(xlim[1], xlim[2], length.out=1000)
+    d1 <- dnorm(qs, mus[1], sigmas[1])
+    d2 <- dnorm(qs, mus[2], sigmas[2])
+    d <- pis[1]*d1+pis[2]*d2
+    # browser()
+    if(plot){
+      op <- par(mai=c(1, 0.8, 1.2, 0.42))
+      hist(x,prob=TRUE, xlab='PUDI',main = main)
+      lines(qs, d, lwd=lwdMixture, lty=2, ...)
+      if(addComp==T){
+        if(weighted){
+          lines(qs, d1*pis[1], lty=2, col=colComp) ## weighted already
+          lines(qs, d2*pis[2], lty=2, col=colComp)
+        } else {
+          lines(qs, d1, lty=2, col=colComp) ## unweighted
+          lines(qs, d2, lty=2, col=colComp)
+        }
+      }
+      abline(v=mus, col=2, lty=2)
+      par(op)
+    } else {
+      return(list(dMat=cbind(qs, d1, d2, d), fit=fit))
+    }
+  }
+  info <- getInfo(DI[gene, ])
+  # browser()
+  plotNormal(noNA(dataraw$mat[gene,]*100), xlab='PDUI',main=sprintf('%s\n%s', gene, info))
+}
