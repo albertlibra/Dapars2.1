@@ -128,6 +128,18 @@ specsen<-function(d1,d2,d3,d4){
   colnames(com)<-c('DI cutoff','benchr','totalr','spec','benchr','totalbench','sen','after-1st','total')
   com
 }
+noNA <- function (dat, returnIndex = FALSE) {
+      sel <- complete.cases(dat)
+      if (returnIndex)
+        return(sel)
+      if (is.null(dim(dat))) {
+        res <- dat[sel]
+      }
+      else {
+        res <- dat[sel, ]
+      }
+      res
+    }
 com_brca<-specsen(di_brca_f,di_brca_all_f,noNA(di_brca),di_brca_all)
 com_blca<-specsen(di_blca_f,di_blca_all_f,noNA(di_blca),di_blca_all)
 com_kirc<-specsen(di_kirc_f,di_kirc_all_f,noNA(di_kirc),di_kirc_all)
