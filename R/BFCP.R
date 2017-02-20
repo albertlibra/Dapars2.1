@@ -57,11 +57,12 @@ BFCP <- function(mat, parallel=TRUE){
         names(res) <- c('delta', 'DI','udiff')
         if(!any(is.na(mat[1:5]))){
           res[1] <- abs(diff(mat[1:2]))/sqrt((1-mat[5])*mat[3]^2+mat[5]*mat[4]^2)
-          res[2] <- (mat[5]/(1-mat[5])) *  res[1]
+          # res[1] <- abs(diff(mat[1:2]))/mat[3]
+          res[2] <- mat[5]/(1-mat[5]) *  res[1]
           res[3] <- abs(diff(mat[1:2]))
         }
         if(!is.na(mat[5]) & (mat[5]==0 | mat[5]==1)){
-          res[1] <- res[2] <- 0 # 1-component data, BI=0
+          res[1] <- res[2] <- 0 #
         }
         res
       }
@@ -181,7 +182,7 @@ loadPDUIdata <- function(file, col_anno=1:3, header=TRUE, TvsN=FALSE){
 plotGene <- function(dataraw, DI, gene){
   #browser()
   getInfo <- function(x, short=F){
-    res <- sprintf('pi1=%.2f, mDiff=%.2f, DI=%.2f,sigma1=%.2f,sigma2=%.2f', x[, 'pi'], x[, 'mdiff'], x[,'DI'],x[,'sigma1'],x[,'sigma2'])
+    res <- sprintf('pi1=%.2f, mu1=%.2f, mu2=%.2f,sigma1=%.2f,sigma2=%.2f', x[, 'pi'], x[, 'mu1'], x[,'mu2'],x[,'sigma1'],x[,'sigma2'])
     res
   }
   noNA <- function (dat, returnIndex = FALSE) {
@@ -196,7 +197,7 @@ plotGene <- function(dataraw, DI, gene){
     }
     res
   }
-  plotNormal <- function(x, xlim=range(x), main=main,lwdMixture=1.2, weighted=T, addComp=T, colComp='blue', plot=TRUE, ...){ # input is untransformed data
+  plotNormal <- function(x, xlim=range(x), main=main,lwdMixture=1.5, weighted=T, addComp=T, colComp='blue', plot=TRUE, ...){ # input is untransformed data
     # browser()
     fit <- DI[gene, ]
     mus <- c(fit[,'mu1'], fit[,'mu2'])
@@ -212,7 +213,7 @@ plotGene <- function(dataraw, DI, gene){
     # browser()
     if(plot){
       op <- par(mai=c(1, 0.8, 1.2, 0.42))
-      hist(x,prob=TRUE, xlab='PUDI',main = main)
+      hist(x,prob=TRUE, xlab='PUDI*100%',main = main)
       lines(qs, d, lwd=lwdMixture, lty=2, ...)
       if(addComp==T){
         if(weighted){
@@ -231,9 +232,11 @@ plotGene <- function(dataraw, DI, gene){
   }
   info <- getInfo(DI[gene, ])
   # browser()
-  plotNormal(noNA(dataraw$mat[gene,]*100), xlab='PDUI',main=sprintf('%s\n%s', gene, info))
+  plotNormal(noNA(dataraw$mat[gene,]*100), xlab='PDUI*100%',main=sprintf('%s\n%s', gene, info))
 }
-
+######
+#' create folder
+#' @export
 createFolder <- function(path, echo=FALSE) {
   if(!file.exists(path))
   {
@@ -246,4 +249,31 @@ createFolder <- function(path, echo=FALSE) {
     if(echo)
       cat('Folder already existed for:\n', deparse(substitute(path)), ':\t', path, '\n')
   }
+}
+######
+#' print fitting plot to pdf file
+#' @export
+printtopdf <- function(dataraw,DI,filename){
+  noNA <- function (dat, returnIndex = FALSE) {
+    sel <- complete.cases(dat)
+    if (returnIndex)
+      return(sel)
+    if (is.null(dim(dat))) {
+      res <- dat[sel]
+    }
+    else {
+      res <- dat[sel, ]
+    }
+    res
+  }
+  pdf(file=file.path(DirOutput,filename ))
+  for(i in 1:nrow(DI)){
+    gene <- rownames(DI)[i]
+    if(! is.na(DI[gene,][,'DI'])){
+      plotGene(dataraw, DI, gene=gene)
+    }else{
+      hist(dataraw$mat[gene, ]*100, prob=TRUE, xlab='PDUI*100%', main=sprintf('%s\n%s', gene, 'Failed fitting'))
+    }
+  }
+  dev.off()
 }

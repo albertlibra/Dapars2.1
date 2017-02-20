@@ -1,0 +1,347 @@
+---
+title: "TCGA-Tumor_only-dimodal"
+author: "Albert"
+date: "February 6, 2017"
+output:
+  pdf_document: default
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## Environment setting
+
+program will be available on [*github*](https://github.com/albertlibra/Dapars2.1)
+
+```{r initialize,echo=FALSE}
+setwd("/home/albert/Tumor")
+options(stringsAsFactors = FALSE)
+WD <- getwd()
+library(devtools)
+ install("/home/albert/Dapars2.1/")
+# install_github("albertlibra/Dapars2.1")
+library(Dapars2.1)
+# SPECIFY A FOLDER NAME TO STORE THIS PARTICULAR ANALYSIS
+SUBANALYSIS <- 'tumor_only' #<-------------------------------------INPUT HERE
+DirObjSave <- file.path(WD, file.path('RDataObjects', paste('Rda', SUBANALYSIS, sep='_')))
+DirOutput <- file.path(WD, file.path('OutputData', paste('outputFiles', SUBANALYSIS, sep='_')))
+DirInputData <- file.path(WD, 'input/APA_1.5_redundant_removal_0.3_percentage')
+DirInputDataAll <- file.path(WD, 'input')
+createFolder(DirOutput)
+createFolder(DirObjSave)
+```
+```{r loading PUDI}
+#benchmark
+datL_lusc <- loadPDUIdata(file=file.path(DirInputData, 'LUSC_known_APA_Combined_PDUIs.txt'),col_anno=1:3,header=T)
+datL_blca <- loadPDUIdata(file=file.path(DirInputData, 'BLCA_known_APA_Combined_PDUIs.txt'),col_anno=1:3,header=T)
+datL_brca <- loadPDUIdata(file=file.path(DirInputData, 'BRCA_known_APA_Combined_PDUIs.txt'),col_anno=1:3,header=T)
+datL_hnsc <- loadPDUIdata(file=file.path(DirInputData, 'HNSC_known_APA_Combined_PDUIs.txt'),col_anno=1:3,header=T)
+datL_luad <- loadPDUIdata(file=file.path(DirInputData, 'LUAD_known_APA_Combined_PDUIs.txt'),col_anno=1:3,header=T)
+datL_ucec <- loadPDUIdata(file=file.path(DirInputData, 'UCEC_known_APA_Combined_PDUIs.txt'),col_anno=1:3,header=T)
+datL_kirc <- loadPDUIdata(file=file.path(DirInputData, 'KIRC_known_APA_Combined_PDUIs.txt'),col_anno=1:3,header=T)
+#tumor only
+datL_lusc_all <- loadPDUIdata(file=file.path(DirInputDataAll, 'TCGA_LUSC_Combined_PDUIs.txt'),col_anno=1:3,header=T)
+datL_blca_all <- loadPDUIdata(file=file.path(DirInputDataAll, 'TCGA_BLCA_Combined_PDUIs.txt'),col_anno=1:3,header=T)
+datL_brca_all <- loadPDUIdata(file=file.path(DirInputDataAll, 'TCGA_BRCA_Combined_PDUIs.txt'),col_anno=1:3,header=T)
+datL_hnsc_all <- loadPDUIdata(file=file.path(DirInputDataAll, 'TCGA_HNSC_Combined_PDUIs.txt'),col_anno=1:3,header=T)
+datL_luad_all <- loadPDUIdata(file=file.path(DirInputDataAll, 'TCGA_LUAD_Combined_PDUIs.txt'),col_anno=1:3,header=T)
+datL_ucec_all <- loadPDUIdata(file=file.path(DirInputDataAll, 'TCGA_UCEC_Combined_PDUIs.txt'),col_anno=1:3,header=T)
+datL_kirc_all <- loadPDUIdata(file=file.path(DirInputDataAll, 'TCGA_KIRC_Combined_PDUIs.txt'),col_anno=1:3,header=T)
+#Gtx
+datL_gtx_brca<-loadPDUIdata(file=file.path(DirInputDataAll,'GTEx_Breast_Female_92_combined_All_PDUIs.txt'),col_anno = 1:2,header = F)
+
+```
+
+
+## dimodal fitting, parallel default enabled
+
+```{r}
+#benchmark
+di_lusc <-  BFCP(datL_lusc$mat) 
+di_blca <-  BFCP(datL_blca$mat) 
+di_brca <-  BFCP(datL_brca$mat) 
+di_hnsc <-  BFCP(datL_hnsc$mat) 
+di_luad <-  BFCP(datL_luad$mat) 
+di_ucec <-  BFCP(datL_ucec$mat) 
+di_kirc <-  BFCP(datL_kirc$mat) 
+
+#Tumor-only 
+di_lusc_all <-  BFCP(datL_lusc_all$mat) 
+di_blca_all <-  BFCP(datL_blca_all$mat) 
+di_brca_all <-  BFCP(datL_brca_all$mat) 
+di_hnsc_all <-  BFCP(datL_hnsc_all$mat) 
+di_luad_all <-  BFCP(datL_luad_all$mat) 
+di_ucec_all <-  BFCP(datL_ucec_all$mat) 
+di_kirc_all <-  BFCP(datL_kirc_all$mat) 
+
+#gtx
+# di_gtx_brca <- BFCP(datL_gtx_brca$mat)
+#save data
+# save.image(file=file.path(DirObjSave,"20170210.RData"))
+
+#load data
+ load(file=file.path(DirObjSave,"20170210.RData"))
+```
+
+## dimodal fitting plot , raw data stored
+```{r}
+# store fitting plot to output folder
+# brca
+printtopdf(datL_brca,di_brca,'mixturePlot_BRCA_benchmark_2sigma.pdf')
+printtopdf(datL_brca_all,di_brca_all,'mixturePlot_BRCA_all_2sigma.pdf')
+
+
+```
+
+
+## datasize test
+
+```{r}
+rsamplepatients<-function(dataraw,percentage){
+res<-dataraw$mat[,sample(ncol(dataraw$mat),ncol(dataraw$mat)*percentage)]
+res
+}
+di_brca0.2<-list()
+for(n in 1:10){
+di_brca0.2[[n]]<-BFCP(rsamplepatients(datL_brca,0.2))
+}
+
+gene <- rownames(di_brca)[1]
+randompatplot<-function(dataraw,listraw,gene=rownames(di_brca)[1]){
+# plotGene(datL_brca, di_brca0.2[[i]], gene=gene)
+noNA <- function (dat, returnIndex = FALSE) {
+    sel <- complete.cases(dat)
+    if (returnIndex)
+      return(sel)
+    if (is.null(dim(dat))) {
+      res <- dat[sel]
+    }
+    else {
+      res <- dat[sel, ]
+    }
+    res
+  }
+
+hist(dataraw$mat[gene, ]*100, prob=TRUE, xlab='PDUI*100%', main=sprintf('%s', gene))
+plotNormal <- function(x, DI,xlim=range(x),lwdMixture=1.2, weighted=T, addComp=T, colComp='blue', plot=TRUE, ...){ # input is untransformed data
+    # browser()
+    fit <- DI[gene, ]
+    mus <- c(fit[,'mu1'], fit[,'mu2'])
+    sigmas <- c(fit[,'sigma1'], fit[,'sigma2'])
+    pis <- c(fit[,'pi'], 1-fit[,'pi'])
+    # browser()
+    # xlim[2] can be inf, make it too large
+    if(!is.finite(xlim[2])) xlim[2] <- quantile(x, 0.99, na.rm=T)
+    qs <- seq(xlim[1], xlim[2], length.out=1000)
+    d1 <- dnorm(qs, mus[1], sigmas[1])
+    d2 <- dnorm(qs, mus[2], sigmas[2])
+    d <- pis[1]*d1+pis[2]*d2
+    # browser()
+    if(plot){
+      op <- par(mai=c(1, 0.8, 1.2, 0.42))
+
+      lines(qs, d, lwd=lwdMixture, lty=2, ...)
+      if(addComp==T){
+        if(weighted){
+          lines(qs, d1*pis[1], lty=2, col=colComp) ## weighted already
+          lines(qs, d2*pis[2], lty=2, col=colComp)
+        } else {
+          lines(qs, d1, lty=2, col=colComp) ## unweighted
+          lines(qs, d2, lty=2, col=colComp)
+        }
+      }
+      abline(v=mus, col=2, lty=2)
+      par(op)
+    } else {
+      return(list(dMat=cdind(qs, d1, d2, d), fit=fit))
+    }
+  }
+for(i in 1:10){
+  plotNormal(noNA(dataraw$mat[gene,]*100),listraw[[i]])
+}
+plotNormal(noNA(dataraw$mat[gene,]*100),di_brca,colComp = 'green')
+}
+```
+
+
+```{r}
+printtopdf2<-function(dataraw,DI,listraw,filename){
+randompatplot<-function(dataraw,listraw,gene){
+# plotGene(datL_brca, di_brca0.2[[i]], gene=gene)
+noNA <- function (dat, returnIndex = FALSE) {
+    sel <- complete.cases(dat)
+    if (returnIndex)
+      return(sel)
+    if (is.null(dim(dat))) {
+      res <- dat[sel]
+    }
+    else {
+      res <- dat[sel, ]
+    }
+    res
+  }
+
+hist(dataraw$mat[gene, ]*100, prob=TRUE, xlab='PDUI*100%', main=sprintf('%s', gene))
+plotNormal <- function(x, DI,xlim=range(x),lwdMixture=1.2, weighted=T, addComp=T, colComp='blue', plot=TRUE, ...){ # input is untransformed data
+    # browser()
+    fit <- DI[gene, ]
+    mus <- c(fit[,'mu1'], fit[,'mu2'])
+    sigmas <- c(fit[,'sigma1'], fit[,'sigma2'])
+    pis <- c(fit[,'pi'], 1-fit[,'pi'])
+    # browser()
+    # xlim[2] can be inf, make it too large
+    if(!is.finite(xlim[2])) xlim[2] <- quantile(x, 0.99, na.rm=T)
+    qs <- seq(xlim[1], xlim[2], length.out=1000)
+    d1 <- dnorm(qs, mus[1], sigmas[1])
+    d2 <- dnorm(qs, mus[2], sigmas[2])
+    d <- pis[1]*d1+pis[2]*d2
+    # browser()
+    if(plot){
+      op <- par(mai=c(1, 0.8, 1.2, 0.42))
+
+       lines(qs, d, lwd=lwdMixture, lty=2, ...)
+      if(addComp==T){
+        if(weighted){
+          lines(qs, d1*pis[1], lty=2, col='blue') ## weighted already
+          lines(qs, d2*pis[2], lty=2, col='red')
+        } else {
+          lines(qs, d1, lty=2, col=colComp) ## unweighted
+          lines(qs, d2, lty=2, col=colComp)
+        }
+      }
+      # abline(v=mus, col=3, lty=2)
+      par(op)
+    } else {
+      return(list(dMat=cdind(qs, d1, d2, d), fit=fit))
+    }
+  }
+for(i in 1:10){
+  plotNormal(noNA(dataraw$mat[gene,]*100),listraw[[i]],lwdMixture = 0)
+}
+plotNormal(noNA(dataraw$mat[gene,]*100),di_brca,lwdMixture = 3)
+}
+pdf(file=file.path(DirOutput,filename ))
+  for(i in 1:nrow(DI)){
+    gene <- rownames(DI)[i]
+    if(! is.na(DI[gene,][,'DI'])){
+      randompatplot(dataraw,listraw,gene)
+    }else{
+      hist(dataraw$mat[gene, ]*100, prob=TRUE, xlab='PDUI*100%', main=sprintf('%s\n%s', gene, 'Failed fitting'))
+    }
+  }
+  dev.off()
+}
+di_brca0.5<-list()
+for(n in 1:10){
+di_brca0.5[[n]]<-BFCP(rsamplepatients(datL_brca,0.5))
+}
+printtopdf2(datL_brca,di_brca,di_brca0.5,'10times50p_rsample.pdf')
+
+gene<-"NM_001190265|C1D|chr2|-"
+hist(datL_brca_all$mat[gene,]*100,prob=TRUE,breaks =10,xlab='PDUI*100%',main=sprintf('%s',gene))
+```
+
+## basic filtering
+```{r}
+di_lusc_f <- subset(di_lusc,mu1 <=60 & mdiff >=6)
+di_blca_f <- subset(di_blca,mu1 <=60 & mdiff >=6)
+di_brca_f <- subset(di_brca,mu1 <=60 & mdiff >=6)
+di_hnsc_f <- subset(di_hnsc,mu1 <=60 & mdiff >=6)
+di_luad_f <- subset(di_luad,mu1 <=60 & mdiff >=6)
+di_ucec_f <- subset(di_ucec,mu1 <=60 & mdiff >=6)
+di_kirc_f <- subset(di_kirc,mu1 <=60 & mdiff >=6)
+
+di_lusc_all_f <- subset(di_lusc_all,mu1 <=60 & mdiff >=6)
+di_blca_all_f <- subset(di_blca_all,mu1 <=60 & mdiff >=6)
+di_brca_all_f <- subset(di_brca_all,mu1 <=60 & mdiff >=6)
+di_hnsc_all_f <- subset(di_hnsc_all,mu1 <=60 & mdiff >=6)
+di_luad_all_f <- subset(di_luad_all,mu1 <=60 & mdiff >=6)
+di_ucec_all_f <- subset(di_ucec_all,mu1 <=60 & mdiff >=6)
+di_kirc_all_f <- subset(di_kirc_all,mu1 <=60 & mdiff >=6)
+```
+
+## gtex
+
+```{r}
+di_gtx_brca_var <- subset(di_gtx_brca,mu1<60&mdiff>6)
+di_brca_sel<-di_brca_f[setdiff(rownames(di_brca_f),rownames(di_gtx_brca_var)) ,]
+di_brca_all_sel<-di_brca_all_f[setdiff(rownames(di_brca_all_f),rownames(di_gtx_brca_var)) ,]
+com_brca_gtex<-specsen(di_brca_sel,di_brca_all_sel,di_brca,di_brca_all)
+# t.test(di_gtx_brca_bench$mu1,di_brca$mu1)
+# t.test(di_gtx_brca_bench$mu2,di_brca$mu2)
+# t.test(di_gtx_brca_bench$delta,di_brca$delta)
+# t.test(di_gtx_brca_bench$pi,di_brca$pi)
+# di_gtx_brca_bench<-di_gtx_brca[rownames(di_brca),]
+```
+
+
+```{r}
+
+for(gene in rownames(di_brca_all)){
+  if(!is.na(di_gtx_brca[gene,][,'DI'])){
+    di_brca_all[gene,]$pv<-c(t.test(datL_brca_all$mat[gene,],datL_gtx_brca$mat[gene,])$p.value[1])
+  }else{
+    di_brca_all[gene,]$pv<-NA
+  }
+}
+```
+
+
+```{r}
+di_brca_all_e$apa<-"L"
+for(gene in rownames(di_brca_e)){
+  di_brca_all_e[gene,]$apa<-"S"
+}
+require(ggvis)
+di_brca_all %>% ggvis(~mu1, ~mdiff,fill= ~apa) %>% layer_points()
+di_brca_all %>% ggvis(~sigma1, ~sigma2,fill= ~apa) %>% layer_points()
+di_brca_all %>% ggvis(~pi, ~mu1,fill= ~apa) %>% layer_points()
+# di_brca_all_e %>% ggvis(~DI,fill= ~apa) %>% layer_points()
+```
+
+
+```{r}
+noNA <- function (dat, returnIndex = FALSE) {
+    sel <- complete.cases(dat)
+    if (returnIndex)
+      return(sel)
+    if (is.null(dim(dat))) {
+      res <- dat[sel]
+    }
+    else {
+      res <- dat[sel, ]
+    }
+    res
+  }
+di_brca_noNA<-subset(noNA(di_brca))
+```
+
+
+## spec/sen 
+
+```{r}
+specsen<-function(d1,d2,d3,d4){
+  com<-data.frame()
+  for (newdin in seq(0,2,by=0.1)){
+    spec  <- length(rownames(subset(d1,DI >= newdin)))/length(rownames(subset(d2,DI >= newdin)))
+    sen<- length(rownames(subset(d1,DI >= newdin)))/length(rownames(d3))
+    if(sen>=0.1){
+    newrow<- c(newdin,length(rownames(subset(d1,DI >= newdin))),length(rownames(subset(d2,DI >=         newdin))),spec,length(rownames(subset(d1,DI >= newdin))),length(rownames(d3)),sen,length(rownames(d2)),length(rownames(d4)))
+    com <- rbind(com,newrow)
+    }
+  }
+  colnames(com)<-c('DI cutoff','benchr','totalr','spec','benchr','totalbench','sen','after-1st','total')
+  com
+}
+com_brca<-specsen(di_brca_f,di_brca_all_f,noNA(di_brca),di_brca_all)
+com_blca<-specsen(di_blca_f,di_blca_all_f,noNA(di_blca),di_blca_all)
+com_kirc<-specsen(di_kirc_f,di_kirc_all_f,noNA(di_kirc),di_kirc_all)
+com_hnsc<-specsen(di_hnsc_f,di_hnsc_all_f,noNA(di_hnsc),di_hnsc_all)
+com_luad<-specsen(di_luad_f,di_luad_all_f,noNA(di_luad),di_luad_all)
+com_ucec<-specsen(di_ucec_f,di_ucec_all_f,noNA(di_ucec),di_ucec_all)
+com_lusc<-specsen(di_lusc_f,di_lusc_all_f,noNA(di_lusc),di_lusc_all)
+
+# com_brca_gtex<-specsen(di_brca_sel,di_brca_all_sel,di_brca,di_brca_all)
+```
+
