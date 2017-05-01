@@ -95,21 +95,21 @@ printtopdf(datL_brca_all,di_brca_all,'mixturePlot_BRCA_all_2sigma.pdf')
 
 ## basic filtering
 ```{r}
-di_lusc_f <- subset(di_lusc,mu1 <=60 & mdiff >=6)
-di_blca_f <- subset(di_blca,mu1 <=60 & mdiff >=6)
-di_brca_f <- subset(di_brca,mu1 <=60 & mdiff >=6)
-di_hnsc_f <- subset(di_hnsc,mu1 <=60 & mdiff >=6)
-di_luad_f <- subset(di_luad,mu1 <=60 & mdiff >=6)
-di_ucec_f <- subset(di_ucec,mu1 <=60 & mdiff >=6)
-di_kirc_f <- subset(di_kirc,mu1 <=60 & mdiff >=6)
+di_lusc_f <- subset(di_lusc,mu1 <=60 & mdiff >=10)
+di_blca_f <- subset(di_blca,mu1 <=60 & mdiff >=10)
+di_brca_f <- subset(di_brca,mu1 <=60 & mdiff >=10)
+di_hnsc_f <- subset(di_hnsc,mu1 <=60 & mdiff >=10)
+di_luad_f <- subset(di_luad,mu1 <=60 & mdiff >=10)
+di_ucec_f <- subset(di_ucec,mu1 <=60 & mdiff >=10)
+di_kirc_f <- subset(di_kirc,mu1 <=60 & mdiff >=10)
 
-di_lusc_all_f <- subset(di_lusc_all,mu1 <=60 & mdiff >=6)
-di_blca_all_f <- subset(di_blca_all,mu1 <=60 & mdiff >=6)
-di_brca_all_f <- subset(di_brca_all,mu1 <=60 & mdiff >=6)
-di_hnsc_all_f <- subset(di_hnsc_all,mu1 <=60 & mdiff >=6)
-di_luad_all_f <- subset(di_luad_all,mu1 <=60 & mdiff >=6)
-di_ucec_all_f <- subset(di_ucec_all,mu1 <=60 & mdiff >=6)
-di_kirc_all_f <- subset(di_kirc_all,mu1 <=60 & mdiff >=6)
+di_lusc_all_f <- subset(di_lusc_all,mu1 <=60 & mdiff >=10)
+di_blca_all_f <- subset(di_blca_all,mu1 <=60 & mdiff >=10)
+di_brca_all_f <- subset(di_brca_all,mu1 <=60 & mdiff >=10)
+di_hnsc_all_f <- subset(di_hnsc_all,mu1 <=60 & mdiff >=10)
+di_luad_all_f <- subset(di_luad_all,mu1 <=60 & mdiff >=10)
+di_ucec_all_f <- subset(di_ucec_all,mu1 <=60 & mdiff >=10)
+di_kirc_all_f <- subset(di_kirc_all,mu1 <=60 & mdiff >=10)
 ```
 
 ## spec/sen 
