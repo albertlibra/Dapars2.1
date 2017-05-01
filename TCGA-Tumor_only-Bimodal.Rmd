@@ -140,13 +140,13 @@ noNA <- function (dat, returnIndex = FALSE) {
       }
       res
     }
-com_brca<-specsen(di_brca_f,di_brca_all_f,noNA(di_brca),di_brca_all)
-com_blca<-specsen(di_blca_f,di_blca_all_f,noNA(di_blca),di_blca_all)
-com_kirc<-specsen(di_kirc_f,di_kirc_all_f,noNA(di_kirc),di_kirc_all)
-com_hnsc<-specsen(di_hnsc_f,di_hnsc_all_f,noNA(di_hnsc),di_hnsc_all)
-com_luad<-specsen(di_luad_f,di_luad_all_f,noNA(di_luad),di_luad_all)
-com_ucec<-specsen(di_ucec_f,di_ucec_all_f,noNA(di_ucec),di_ucec_all)
-com_lusc<-specsen(di_lusc_f,di_lusc_all_f,noNA(di_lusc),di_lusc_all)
+com_brca<-specsen(di_brca_f,di_brca_all_f,di_brca_f,di_brca_all)
+com_blca<-specsen(di_blca_f,di_blca_all_f,di_blca_f,di_blca_all)
+com_kirc<-specsen(di_kirc_f,di_kirc_all_f,di_kirc_f,di_kirc_all)
+com_hnsc<-specsen(di_hnsc_f,di_hnsc_all_f,di_hnsc_f,di_hnsc_all)
+com_luad<-specsen(di_luad_f,di_luad_all_f,di_luad_f,di_luad_all)
+com_ucec<-specsen(di_ucec_f,di_ucec_all_f,di_ucec_f,di_ucec_all)
+com_lusc<-specsen(di_lusc_f,di_lusc_all_f,di_lusc_f,di_lusc_all)
 
 # com_brca_gtex<-specsen(di_brca_sel,di_brca_all_sel,di_brca,di_brca_all)
 ```
